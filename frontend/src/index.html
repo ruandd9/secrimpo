@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SECRIMPO - Termo de Apreensão</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -24,7 +25,7 @@
     <!-- User Info -->
     <div class="user-info">
         <div class="user-avatar">
-            <span class="avatar-icon">👤</span>
+            <span class="avatar-icon"><i class="fas fa-user"></i></span>
             <span class="user-name">Anderson dos Santos Matos Mota</span>
         </div>
         <div class="user-status">
@@ -99,10 +100,10 @@
                                 <textarea id="descricao_0" name="descricao_0" placeholder="Descrição Detalhada" rows="3" required></textarea>
                             </div>
                         </div>
-                        <button type="button" class="btn-remove-item" onclick="removeItem(0)" style="display: none;">❌</button>
+                        <button type="button" class="btn-remove-item" onclick="removeItem(0)" style="display: none;"><i class="fas fa-times"></i></button>
                     </div>
                 </div>
-                <button type="button" class="btn-add-item" onclick="addItem()">➕ Adicionar Item</button>
+                <button type="button" class="btn-add-item" onclick="addItem()"><i class="fas fa-plus"></i> Adicionar Item</button>
             </section>
 
             <!-- Dados do Proprietário -->
@@ -128,8 +129,8 @@
                     </div>
                 </div>
                 <div class="proprietario-actions">
-                    <button type="button" class="btn-secondary" onclick="buscarProprietario()">🔍 Buscar</button>
-                    <button type="button" class="btn-secondary" onclick="novoProprietario()">➕ Novo</button>
+                    <button type="button" class="btn-secondary" onclick="buscarProprietario()"><i class="fas fa-search"></i> Buscar</button>
+                    <button type="button" class="btn-secondary" onclick="novoProprietario()"><i class="fas fa-plus"></i> Novo</button>
                 </div>
             </section>
 
@@ -177,13 +178,13 @@
                     </div>
                 </div>
                 <div class="policial-actions">
-                    <button type="button" class="btn-secondary" onclick="buscarPolicial()">🔍 Buscar</button>
+                    <button type="button" class="btn-secondary" onclick="buscarPolicial()"><i class="fas fa-search"></i> Buscar</button>
                 </div>
             </section>
 
             <!-- Botão Salvar -->
             <div class="form-actions">
-                <button type="submit" class="btn-primary">Salvar em PNG</button>
+                <button type="submit" class="btn-primary"><i class="fas fa-save"></i> Salvar em PNG</button>
             </div>
         </form>
     </main>

@@ -11,10 +11,10 @@ API_BASE = "http://127.0.0.1:8000"
 def format_table(data, title):
     """Formata dados em tabela para exibição"""
     if not data:
-        print(f"   📭 Nenhum {title.lower()} encontrado")
+        print(f"   [INBOX] Nenhum {title.lower()} encontrado")
         return
     
-    print(f"   📊 Total: {len(data)} {title.lower()}(s)")
+    print(f"   [CHART-BAR] Total: {len(data)} {title.lower()}(s)")
     for i, item in enumerate(data, 1):
         print(f"   {i:2d}. {format_item(item)}")
 
@@ -37,53 +37,53 @@ def format_item(item):
 
 def view_database():
     """Visualiza todos os dados existentes no banco"""
-    print("🔍 VISUALIZANDO DADOS EXISTENTES NO BANCO SECRIMPO")
+    print("[SEARCH] VISUALIZANDO DADOS EXISTENTES NO BANCO SECRIMPO")
     print("=" * 60)
     
     try:
         # Health check
-        print("\n🏥 Verificando conexão com a API...")
+        print("\n[HEARTBEAT] Verificando conexão com a API...")
         response = requests.get(f"{API_BASE}/")
         if response.status_code == 200:
             api_info = response.json()
-            print(f"   ✅ {api_info['message']} (v{api_info.get('version', 'N/A')})")
+            print(f"   [CHECK] {api_info['message']} (v{api_info.get('version', 'N/A')})")
         else:
-            print(f"   ❌ Erro na conexão: {response.status_code}")
+            print(f"   [TIMES] Erro na conexão: {response.status_code}")
             return
         
         # Estatísticas gerais
-        print("\n📈 ESTATÍSTICAS GERAIS")
+        print("\n[CHART-BAR] ESTATÍSTICAS GERAIS")
         print("-" * 30)
         response = requests.get(f"{API_BASE}/estatisticas/")
         if response.status_code == 200:
             stats = response.json()
-            print(f"   👮 Policiais: {stats['total_policiais']}")
-            print(f"   👤 Proprietários: {stats['total_proprietarios']}")
-            print(f"   📋 Ocorrências: {stats['total_ocorrencias']}")
-            print(f"   📦 Itens Apreendidos: {stats['total_itens']}")
+            print(f"   [USER-SHIELD] Policiais: {stats['total_policiais']}")
+            print(f"   [USER] Proprietários: {stats['total_proprietarios']}")
+            print(f"   [CLIPBOARD-LIST] Ocorrências: {stats['total_ocorrencias']}")
+            print(f"   [BOX] Itens Apreendidos: {stats['total_itens']}")
         
         # Listar policiais
-        print("\n👮 POLICIAIS CADASTRADOS")
+        print("\n[USER-SHIELD] POLICIAIS CADASTRADOS")
         print("-" * 30)
         response = requests.get(f"{API_BASE}/policiais/")
         if response.status_code == 200:
             policiais = response.json()
             format_table(policiais, "Policial")
         else:
-            print(f"   ❌ Erro ao buscar policiais: {response.status_code}")
+            print(f"   [TIMES] Erro ao buscar policiais: {response.status_code}")
         
         # Listar proprietários
-        print("\n👤 PROPRIETÁRIOS CADASTRADOS")
+        print("\n[USER] PROPRIETÁRIOS CADASTRADOS")
         print("-" * 30)
         response = requests.get(f"{API_BASE}/proprietarios/")
         if response.status_code == 200:
             proprietarios = response.json()
             format_table(proprietarios, "Proprietário")
         else:
-            print(f"   ❌ Erro ao buscar proprietários: {response.status_code}")
+            print(f"   [TIMES] Erro ao buscar proprietários: {response.status_code}")
         
         # Listar ocorrências
-        print("\n📋 OCORRÊNCIAS REGISTRADAS")
+        print("\n[CLIPBOARD-LIST] OCORRÊNCIAS REGISTRADAS")
         print("-" * 30)
         response = requests.get(f"{API_BASE}/ocorrencias/")
         if response.status_code == 200:
@@ -92,10 +92,10 @@ def view_database():
             
             # Para cada ocorrência, listar itens
             if ocorrencias:
-                print("\n📦 ITENS POR OCORRÊNCIA")
+                print("\n[BOX] ITENS POR OCORRÊNCIA")
                 print("-" * 30)
                 for ocorrencia in ocorrencias:
-                    print(f"\n   🔸 Ocorrência Genesis: {ocorrencia['numero_genesis']}")
+                    print(f"\n   [CIRCLE] Ocorrência Genesis: {ocorrencia['numero_genesis']}")
                     response = requests.get(f"{API_BASE}/itens/ocorrencia/{ocorrencia['id']}")
                     if response.status_code == 200:
                         itens = response.json()
@@ -103,34 +103,34 @@ def view_database():
                             for j, item in enumerate(itens, 1):
                                 print(f"      {j}. {format_item(item)}")
                         else:
-                            print("      📭 Nenhum item apreendido")
+                            print("      [INBOX] Nenhum item apreendido")
         else:
-            print(f"   ❌ Erro ao buscar ocorrências: {response.status_code}")
+            print(f"   [TIMES] Erro ao buscar ocorrências: {response.status_code}")
         
         # Listar todos os itens
-        print("\n📦 TODOS OS ITENS APREENDIDOS")
+        print("\n[BOX] TODOS OS ITENS APREENDIDOS")
         print("-" * 30)
         response = requests.get(f"{API_BASE}/itens/")
         if response.status_code == 200:
             itens = response.json()
             format_table(itens, "Item")
         else:
-            print(f"   ❌ Erro ao buscar itens: {response.status_code}")
+            print(f"   [TIMES] Erro ao buscar itens: {response.status_code}")
         
         print("\n" + "=" * 60)
-        print("✅ Visualização concluída com sucesso!")
-        print("💡 Para adicionar novos dados, use o frontend Electron ou faça requisições POST para a API")
+        print("[CHECK] Visualização concluída com sucesso!")
+        print("[LIGHTBULB] Para adicionar novos dados, use o frontend Electron ou faça requisições POST para a API")
         
     except requests.exceptions.ConnectionError:
-        print("❌ ERRO: Não foi possível conectar à API.")
-        print("🔧 Certifique-se de que o servidor está rodando:")
+        print("[TIMES] ERRO: Não foi possível conectar à API.")
+        print("[WRENCH] Certifique-se de que o servidor está rodando:")
         print("   cd backend && python start_api.py")
     except Exception as e:
-        print(f"❌ Erro inesperado: {e}")
+        print(f"[TIMES] Erro inesperado: {e}")
 
 def test_endpoints():
     """Testa se todos os endpoints estão respondendo"""
-    print("\n🧪 TESTANDO ENDPOINTS DA API")
+    print("\n[FLASK] TESTANDO ENDPOINTS DA API")
     print("-" * 30)
     
     endpoints = [
@@ -145,10 +145,10 @@ def test_endpoints():
     for method, endpoint, description in endpoints:
         try:
             response = requests.get(f"{API_BASE}{endpoint}")
-            status = "✅" if response.status_code == 200 else "❌"
+            status = "[CHECK]" if response.status_code == 200 else "[TIMES]"
             print(f"   {status} {description}: {response.status_code}")
         except Exception as e:
-            print(f"   ❌ {description}: Erro - {e}")
+            print(f"   [TIMES] {description}: Erro - {e}")
 
 if __name__ == "__main__":
     view_database()

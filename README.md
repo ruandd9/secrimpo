@@ -2,7 +2,7 @@
 
 Sistema completo para registro de ocorrências policiais, itens apreendidos e geração automática de relatórios, desenvolvido especificamente para agentes SECRIMPO.
 
-## 🚀 Visão Geral
+## Visão Geral
 
 O SECRIMPO é um sistema moderno e eficiente que combina:
 - **Backend FastAPI** para API REST robusta
@@ -10,17 +10,17 @@ O SECRIMPO é um sistema moderno e eficiente que combina:
 - **Banco SQLite** para armazenamento local
 - **Exportação Excel** para relatórios profissionais
 
-### ✨ Funcionalidades Principais
+### Funcionalidades Principais
 
-- 📋 **Cadastro completo** de ocorrências policiais
-- 👮 **Gestão de policiais** com graduações predefinidas
-- 👤 **Registro de proprietários** com validação de documentos
-- 📦 **Itens apreendidos** com categorização inteligente
-- 📊 **Exportação automática** para Excel
-- 🔍 **Busca e validação** em tempo real
-- 💾 **Armazenamento local** sem necessidade de internet
+- **Cadastro completo** de ocorrências policiais
+- **Gestão de policiais** com graduações predefinidas
+- **Registro de proprietários** com validação de documentos
+- **Itens apreendidos** com categorização inteligente
+- **Exportação automática** para Excel
+- **Busca e validação** em tempo real
+- **Armazenamento local** sem necessidade de internet
 
-## 🛠️ Tecnologias Utilizadas
+## Tecnologias Utilizadas
 
 ### Backend
 - **FastAPI** - API REST moderna e rápida
@@ -35,7 +35,7 @@ O SECRIMPO é um sistema moderno e eficiente que combina:
 - **JavaScript ES6+** - Lógica da aplicação
 - **Axios** - Comunicação com API
 
-## 📁 Estrutura do Projeto
+## Estrutura do Projeto
 
 ```
 secrimpo/
@@ -65,7 +65,7 @@ secrimpo/
 └── README.md                    # Este arquivo
 ```
 
-## 🚀 Instalação e Execução
+## Instalação e Execução
 
 ### Pré-requisitos
 - Python 3.8+ instalado
@@ -107,7 +107,7 @@ npm start
 - **API Documentation**: http://127.0.0.1:8000/docs
 - **API Health Check**: http://127.0.0.1:8000/
 
-## 📋 Como Usar
+## Como Usar
 
 ### Preenchimento do Formulário
 
@@ -122,20 +122,20 @@ npm start
    - Selecione a espécie (dropdown inteligente)
    - Escolha o item específico
    - Informe quantidade e descrição
-   - ➕ Adicione múltiplos itens
+   - Adicione múltiplos itens
 
 3. **Dados do Proprietário**
    - Selecione tipo de documento (CPF/RG)
    - Digite o documento (máscara automática)
    - Informe o nome
-   - 🔍 Busca automática por documento
+   - Busca automática por documento
 
 4. **Dados do Policial**
    - Nome do policial
    - Matrícula
    - Graduação (dropdown predefinido)
    - Unidade (8ª, 10ª ou 16ª CPR)
-   - 🔍 Busca automática por matrícula
+   - Busca automática por matrícula
 
 ### Recursos Especiais
 
@@ -145,7 +145,7 @@ npm start
 - **Dropdowns Inteligentes**: Itens mudam baseado na espécie
 - **Feedback Visual**: Indicadores de sucesso/erro
 
-## 🧪 Testes e Desenvolvimento
+## Testes e Desenvolvimento
 
 ### Visualizar Dados do Banco
 ```bash
@@ -171,7 +171,7 @@ cd frontend
 npm run dev  # Inicia com DevTools aberto
 ```
 
-## 📊 Exportação de Dados
+## Exportação de Dados
 
 O sistema oferece múltiplas opções de exportação:
 
@@ -180,7 +180,7 @@ O sistema oferece múltiplas opções de exportação:
 - **Por Policial**: Relatório individual
 - **Estatísticas**: Análises detalhadas
 
-## 🔧 Configuração
+## Configuração
 
 ### Variáveis de Ambiente
 - `API_HOST`: Host da API (padrão: 127.0.0.1)
@@ -192,7 +192,7 @@ O sistema oferece múltiplas opções de exportação:
 - **Graduações**: Modifique o dropdown de graduações
 - **Espécies/Itens**: Atualize o mapeamento em `frontend/src/app.js`
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### API não conecta
 ```bash
@@ -221,7 +221,7 @@ rm backend/secrimpo.db
 cd backend && python start_api.py
 ```
 
-## 🤝 Contribuição
+## Contribuição
 
 1. Fork o projeto
 2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
@@ -229,11 +229,11 @@ cd backend && python start_api.py
 4. Push para a branch (`git push origin feature/AmazingFeature`)
 5. Abra um Pull Request
 
-## 📝 Licença
+## Licença
 
 Este projeto é livre para uso acadêmico e institucional. Consulte o arquivo LICENSE para mais detalhes.
 
-## 👥 Suporte
+## Suporte
 
 Para suporte técnico ou dúvidas:
 - Abra uma issue no GitHub
@@ -242,4 +242,4 @@ Para suporte técnico ou dúvidas:
 
 ---
 
-**Desenvolvido para facilitar o trabalho dos agentes SECRIMPO no registro e controle de ocorrências e apreensões.** 🚔✨ 
+**Desenvolvido para facilitar o trabalho dos agentes SECRIMPO no registro e controle de ocorrências e apreensões.** 

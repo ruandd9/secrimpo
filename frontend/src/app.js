@@ -21,7 +21,7 @@ const itemsPorEspecie = {
 
 // Inicialização da aplicação
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log('🚀 Iniciando SECRIMPO Frontend...');
+    console.log('[ROCKET] Iniciando SECRIMPO Frontend...');
 
     // Carrega dados iniciais
     await loadInitialData();
@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Configura data atual
     document.getElementById('dataApreensao').valueAsDate = new Date();
 
-    console.log('✅ SECRIMPO Frontend carregado com sucesso!');
+    console.log('[CHECK] SECRIMPO Frontend carregado com sucesso!');
 });
 
 // Carrega dados iniciais da API
@@ -44,18 +44,18 @@ async function loadInitialData() {
         const policiaisResponse = await window.secrimpoAPI.listarPoliciais();
         if (policiaisResponse.success) {
             appState.policiais = policiaisResponse.data;
-            console.log(`📋 ${appState.policiais.length} policiais carregados`);
+            console.log(`[CLIPBOARD-LIST] ${appState.policiais.length} policiais carregados`);
         }
 
         // Carrega proprietários
         const proprietariosResponse = await window.secrimpoAPI.listarProprietarios();
         if (proprietariosResponse.success) {
             appState.proprietarios = proprietariosResponse.data;
-            console.log(`📋 ${appState.proprietarios.length} proprietários carregados`);
+            console.log(`[CLIPBOARD-LIST] ${appState.proprietarios.length} proprietários carregados`);
         }
 
     } catch (error) {
-        console.error('❌ Erro ao carregar dados iniciais:', error);
+        console.error('[TIMES] Erro ao carregar dados iniciais:', error);
         showMessage('Erro ao conectar com a API. Verifique se o servidor está rodando.', 'error');
     } finally {
         showLoading(false);
@@ -125,7 +125,7 @@ async function handleFormSubmit(e) {
         }, 2000);
 
     } catch (error) {
-        console.error('❌ Erro ao salvar:', error);
+        console.error('[TIMES] Erro ao salvar:', error);
         showMessage('Erro ao salvar o termo de apreensão.', 'error');
     } finally {
         showLoading(false);
@@ -272,7 +272,7 @@ function addItem() {
                 <textarea id="descricao_${newIndex}" name="descricao_${newIndex}" placeholder="Descrição Detalhada" rows="3" required></textarea>
             </div>
         </div>
-        <button type="button" class="btn-remove-item" onclick="removeItem(${newIndex})">❌</button>
+        <button type="button" class="btn-remove-item" onclick="removeItem(${newIndex})"><i class="fas fa-times"></i></button>
     `;
 
     container.appendChild(itemRow);
