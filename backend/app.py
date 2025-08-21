@@ -8,6 +8,7 @@ from pydantic import BaseModel, validator
 from typing import List, Optional
 from datetime import date
 import os
+from config import UNIDADES_DISPONIVEIS
 
 # Configuração do banco de dados
 DATABASE_URL = "sqlite:///./secrimpo.db"
@@ -239,6 +240,11 @@ async def listar_itens(skip: int = 0, limit: int = 100, db: Session = Depends(ge
 @app.get("/itens/ocorrencia/{ocorrencia_id}", response_model=List[ItemApreendidoResponse])
 async def listar_itens_por_ocorrencia(ocorrencia_id: int, db: Session = Depends(get_db)):
     return db.query(ItemApreendido).filter(ItemApreendido.ocorrencia_id == ocorrencia_id).all()
+
+# UNIDADES DISPONÍVEIS
+@app.get("/unidades/")
+async def obter_unidades():
+    return {"unidades": UNIDADES_DISPONIVEIS}
 
 # ESTATÍSTICAS
 @app.get("/estatisticas/")

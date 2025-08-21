@@ -36,6 +36,13 @@ EXPORT_FORMATS = ["xlsx", "csv"]  # Formatos suportados
 DEFAULT_PAGE_SIZE = 50
 MAX_PAGE_SIZE = 1000
 
+# Unidades disponíveis para seleção
+UNIDADES_DISPONIVEIS = [
+    "8ª CPR",
+    "10ª CPR", 
+    "16ª CPR"
+]
+
 # Configurações de logging
 LOG_LEVEL = "INFO"
 LOG_FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
