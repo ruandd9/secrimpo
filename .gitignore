@@ -343,3 +343,8 @@ config.local.js
 secrimpo.log
 api.log
 electron.log
+
+# === Documentação ===
+# Manter arquivos .md na pasta documents/
+!documents/
+!documents/*.md

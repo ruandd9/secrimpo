@@ -145,6 +145,17 @@ npm start
 - **Dropdowns Inteligentes**: Itens mudam baseado na espécie
 - **Feedback Visual**: Indicadores de sucesso/erro
 
+## Documentação Completa
+
+### 📚 Documentação Técnica
+Toda a documentação detalhada está disponível na pasta [`documents/`](./documents/):
+
+- **[Guia de Início Rápido](./documents/QUICK_START.md)** - Comece aqui!
+- **[Sincronização em Rede](./documents/NETWORK_SYNC_GUIDE.md)** - Multi-usuário
+- **[Documentação da API](./documents/API_DOCUMENTATION.md)** - Endpoints completos
+- **[Solução de Problemas](./documents/TROUBLESHOOTING.md)** - Troubleshooting
+- **[Índice Completo](./documents/README.md)** - Todos os documentos
+
 ## Testes e Desenvolvimento
 
 ### Visualizar Dados do Banco
@@ -168,7 +179,7 @@ curl http://127.0.0.1:8000/estatisticas/
 ### Desenvolvimento Frontend
 ```bash
 cd frontend
-npm run dev  # Inicia com DevTools aberto
+npm start  # Inicia com DevTools aberto
 ```
 
 ## Exportação de Dados
