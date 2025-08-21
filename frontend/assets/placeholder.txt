@@ -1,0 +1,6 @@
+Placeholder para logos:
+- logo-pm.png (Logo da Polícia Militar)
+- logo-gdf.png (Logo do GDF)
+- icon.png (Ícone da aplicação)
+
+Você pode adicionar as imagens reais aqui.

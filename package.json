@@ -1,0 +1,34 @@
+{
+  "name": "secrimpo",
+  "version": "1.0.0",
+  "description": "Sistema de Registro de Ocorrências SECRIMPO",
+  "main": "index.js",
+  "scripts": {
+    "start": "npm run start:backend & npm run start:frontend",
+    "start:backend": "cd backend && python start_api.py",
+    "start:frontend": "cd frontend && npm start",
+    "install:all": "cd backend && pip install -r requirements.txt && cd ../frontend && npm install",
+    "test": "cd backend && python test_api.py",
+    "dev": "npm run start:backend & cd frontend && npm run dev",
+    "build": "cd frontend && npm run build",
+    "clean": "rm -rf backend/__pycache__ backend/*.db frontend/node_modules frontend/out"
+  },
+  "keywords": [
+    "secrimpo",
+    "policia",
+    "ocorrencias",
+    "electron",
+    "fastapi",
+    "sqlite"
+  ],
+  "author": "SECRIMPO Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/seu-usuario/secrimpo.git"
+  },
+  "bugs": {
+    "url": "https://github.com/seu-usuario/secrimpo/issues"
+  },
+  "homepage": "https://github.com/seu-usuario/secrimpo#readme"
+}

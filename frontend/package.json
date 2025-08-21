@@ -1,0 +1,20 @@
+{
+  "name": "secrimpo-frontend",
+  "version": "1.0.0",
+  "description": "Frontend Electron para SECRIMPO",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "build": "electron-builder"
+  },
+  "keywords": ["electron", "secrimpo", "policia"],
+  "author": "SECRIMPO Team",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^27.0.0"
+  },
+  "dependencies": {
+    "axios": "^1.6.0"
+  }
+}

@@ -1,0 +1,50 @@
+# Backend específico - SECRIMPO
+
+# Banco de dados SQLite
+*.db
+*.sqlite
+*.sqlite3
+secrimpo.db
+
+# Arquivos de exportação
+exports/
+*.xlsx
+*.xls
+*.csv
+
+# Configurações locais
+config.local.py
+.env.local
+
+# Logs da API
+*.log
+api.log
+uvicorn.log
+
+# Cache Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+venv/
+env/
+.venv/
+
+# Pytest
+.pytest_cache/
+.coverage
+
+# Alembic (se usado futuramente)
+alembic/versions/*.py
+!alembic/versions/__init__.py
+
+# Backup de dados
+backup/
+*.backup
+
+# Arquivos temporários
+temp/
+tmp/
+*.tmp

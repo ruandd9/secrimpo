@@ -1,0 +1,17 @@
+# FastAPI e dependências
+fastapi
+uvicorn[standard]
+python-multipart
+
+# Banco de dados
+sqlalchemy
+
+# Validação de dados
+pydantic
+
+# Exportação e manipulação de dados
+pandas
+openpyxl
+
+# Utilitários
+python-dateutil

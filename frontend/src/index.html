@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SECRIMPO - Termo de Apreensão</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <img src="../assets/logo-pm.png" alt="Polícia Militar" class="logo">
+        </div>
+        <div class="header-center">
+            <h1>SECRIMPO</h1>
+            <p>TERMO DE APREENSÃO 4ª CPR - PMDF</p>
+        </div>
+        <div class="header-right">
+            <img src="../assets/logo-gdf.png" alt="GDF" class="logo">
+        </div>
+    </header>
+
+    <!-- User Info -->
+    <div class="user-info">
+        <div class="user-avatar">
+            <span class="avatar-icon">👤</span>
+            <span class="user-name">Anderson dos Santos Matos Mota</span>
+        </div>
+        <div class="user-status">
+            <span>Usuário Logado - Bem Vindo</span>
+        </div>
+    </div>
+
+    <!-- Main Form -->
+    <main class="main-content">
+        <form id="secrimpoForm" class="secrimpo-form">
+            <!-- Dados da Ocorrência -->
+            <section class="form-section">
+                <h2 class="section-title">DADOS DA OCORRÊNCIA</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="numeroGenesis">Número Gênesis</label>
+                        <input type="text" id="numeroGenesis" name="numeroGenesis" placeholder="Digite o número Gênesis" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="unidadeFato">Unidade do Fato</label>
+                        <input type="text" id="unidadeFato" name="unidadeFato" placeholder="Digite a unidade do fato" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="dataApreensao">Data da Apreensão</label>
+                        <input type="date" id="dataApreensao" name="dataApreensao" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="leiInfringida">Lei Infringida</label>
+                        <input type="text" id="leiInfringida" name="leiInfringida" placeholder="Digite a lei infringida" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="artigo">Artigo</label>
+                        <input type="text" id="artigo" name="artigo" placeholder="Digite o artigo" required>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Itens Apreendidos -->
+            <section class="form-section">
+                <h2 class="section-title">ITENS APREENDIDOS</h2>
+                <div class="items-container" id="itemsContainer">
+                    <div class="item-row" data-item-index="0">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="especie_0">Espécie</label>
+                                <select id="especie_0" name="especie_0" required>
+                                    <option value="">Selecione a Espécie</option>
+                                    <option value="Entorpecente">Entorpecente</option>
+                                    <option value="Arma">Arma</option>
+                                    <option value="Munição">Munição</option>
+                                    <option value="Documento">Documento</option>
+                                    <option value="Dinheiro">Dinheiro</option>
+                                    <option value="Eletrônico">Eletrônico</option>
+                                    <option value="Veículo">Veículo</option>
+                                    <option value="Outros">Outros</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="item_0">Item</label>
+                                <select id="item_0" name="item_0" required>
+                                    <option value="">Selecione o Item</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="quantidade_0">Quantidade</label>
+                                <input type="number" id="quantidade_0" name="quantidade_0" min="1" required>
+                            </div>
+                            <div class="form-group full-width">
+                                <label for="descricao_0">Descrição</label>
+                                <textarea id="descricao_0" name="descricao_0" placeholder="Descrição Detalhada" rows="3" required></textarea>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-remove-item" onclick="removeItem(0)" style="display: none;">❌</button>
+                    </div>
+                </div>
+                <button type="button" class="btn-add-item" onclick="addItem()">➕ Adicionar Item</button>
+            </section>
+
+            <!-- Dados do Proprietário -->
+            <section class="form-section">
+                <h2 class="section-title">DADOS DO PROPRIETÁRIO</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="proprietarioNome">Nome</label>
+                        <input type="text" id="proprietarioNome" name="proprietarioNome" placeholder="Digite o nome" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="tipoDocumento">Tipo de Documento</label>
+                        <select id="tipoDocumento" name="tipoDocumento" required onchange="updateDocumentMask()">
+                            <option value="">Selecione o tipo</option>
+                            <option value="CPF">CPF</option>
+                            <option value="RG">RG</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="proprietarioDocumento">Documento</label>
+                        <input type="text" id="proprietarioDocumento" name="proprietarioDocumento" placeholder="Digite o documento" required>
+                        <small id="documentoHint" class="input-hint"></small>
+                    </div>
+                </div>
+                <div class="proprietario-actions">
+                    <button type="button" class="btn-secondary" onclick="buscarProprietario()">🔍 Buscar</button>
+                    <button type="button" class="btn-secondary" onclick="novoProprietario()">➕ Novo</button>
+                </div>
+            </section>
+
+            <!-- Dados do Policial -->
+            <section class="form-section">
+                <h2 class="section-title">DADOS DO POLICIAL</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="policialNome">Nome</label>
+                        <input type="text" id="policialNome" name="policialNome" placeholder="Digite o nome" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="policialMatricula">Matrícula</label>
+                        <input type="text" id="policialMatricula" name="policialMatricula" placeholder="Digite a matrícula" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="policialGraduacao">Graduação</label>
+                        <select id="policialGraduacao" name="policialGraduacao" required>
+                            <option value="">Selecione a graduação</option>
+                            <option value="Soldado">Soldado</option>
+                            <option value="Cabo">Cabo</option>
+                            <option value="3º Sargento">3º Sargento</option>
+                            <option value="2º Sargento">2º Sargento</option>
+                            <option value="1º Sargento">1º Sargento</option>
+                            <option value="Subtenente">Subtenente</option>
+                            <option value="Aspirante">Aspirante</option>
+                            <option value="2º Tenente">2º Tenente</option>
+                            <option value="1º Tenente">1º Tenente</option>
+                            <option value="Capitão">Capitão</option>
+                            <option value="Major">Major</option>
+                            <option value="Tenente Coronel">Tenente Coronel</option>
+                            <option value="Coronel">Coronel</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="policialUnidade">Unidade</label>
+                        <select id="policialUnidade" name="policialUnidade" required>
+                            <option value="">Selecione a unidade</option>
+                            <option value="8ª CPR">8ª CPR</option>
+                            <option value="10ª CPR">10ª CPR</option>
+                            <option value="16ª CPR">16ª CPR</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="policial-actions">
+                    <button type="button" class="btn-secondary" onclick="buscarPolicial()">🔍 Buscar</button>
+                </div>
+            </section>
+
+            <!-- Botão Salvar -->
+            <div class="form-actions">
+                <button type="submit" class="btn-primary">Salvar em PNG</button>
+            </div>
+        </form>
+    </main>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+        <div class="loading-spinner"></div>
+        <p>Processando...</p>
+    </div>
+
+    <!-- Success/Error Messages -->
+    <div id="messageContainer" class="message-container"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
