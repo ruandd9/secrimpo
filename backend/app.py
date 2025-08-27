@@ -10,9 +10,17 @@ from datetime import date
 import os
 from config import UNIDADES_DISPONIVEIS
 
-# Configuração do banco de dados
-DATABASE_URL = "sqlite:///./secrimpo.db"
-engine = create_engine(DATABASE_URL, echo=True)
+# Configuração do banco de dados (usando config.py)
+from config import DATABASE_URL, SHARED_MODE, SQLITE_CONFIG
+
+# Criar engine com configurações apropriadas
+if SHARED_MODE:
+    engine = create_engine(DATABASE_URL, echo=True, **SQLITE_CONFIG)
+    print(f"[CHECK] Usando banco compartilhado: {DATABASE_URL}")
+else:
+    engine = create_engine(DATABASE_URL, echo=True)
+    print(f"[INFO] Usando banco local: {DATABASE_URL}")
+
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 

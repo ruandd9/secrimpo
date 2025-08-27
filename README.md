@@ -107,6 +107,66 @@ npm start
 - **API Documentation**: http://127.0.0.1:8000/docs
 - **API Health Check**: http://127.0.0.1:8000/
 
+## 🗂️ Pasta Compartilhada Multi-Usuário
+
+### Para Múltiplos Usuários (Novo!)
+
+Se você precisa que vários usuários acessem os mesmos dados simultaneamente:
+
+#### Configuração Rápida
+```bash
+# Execute o configurador de pasta compartilhada
+python setup_shared_folder.py
+
+# Teste a configuração
+python test_shared_setup.py
+
+# Inicie normalmente
+python backend/start_api.py
+```
+
+#### Opções de Compartilhamento
+
+1. **Pasta Local Compartilhada** (Mais Simples)
+   - Cria pasta no PC atual: `C:\SecrimpoShared`
+   - Compartilha via rede Windows/Linux
+   - Outros PCs acessam via `\\seupc\SecrimpoShared`
+
+2. **Servidor de Arquivos** (Mais Robusto)
+   - Usa servidor existente: `\\servidor\SecrimpoData`
+   - Melhor para muitos usuários
+   - Backup centralizado
+
+3. **Unidade Mapeada** (Mais Conveniente)
+   - Mapeia como `Z:\SecrimpoData`
+   - Fácil acesso para usuários
+   - Transparente no uso
+
+#### Configuração em Cada PC
+```bash
+# Em cada PC cliente, execute:
+python setup_shared_folder.py
+
+# Escolha a mesma pasta compartilhada
+# O sistema detecta automaticamente os dados existentes
+```
+
+#### Verificar Status
+```bash
+# Diagnóstico completo da pasta compartilhada
+python backend/diagnostico_compartilhado.py
+
+# Teste rápido
+python test_shared_setup.py
+```
+
+### Vantagens da Pasta Compartilhada
+- ✅ **Dados Sincronizados**: Todos veem as mesmas informações
+- ✅ **Backup Centralizado**: Um local para fazer backup
+- ✅ **Fácil Configuração**: Script automatizado
+- ✅ **Sem Servidor**: Usa infraestrutura existente
+- ✅ **Múltiplos Usuários**: Até 10 usuários simultâneos
+
 ## Como Usar
 
 ### Preenchimento do Formulário
