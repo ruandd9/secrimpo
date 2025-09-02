@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sincronização - SECRIMPO</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: #007bff;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .content {
+            padding: 20px;
+        }
+        
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .user-input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        
+        .btn-primary:hover:not(:disabled) {
+            background: #0056b3;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover:not(:disabled) {
+            background: #545b62;
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .sync-section {
+            margin-bottom: 30px;
+        }
+        
+        .sync-actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .info-card {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+        
+        .info-card h4 {
+            margin: 0 0 10px 0;
+            color: #495057;
+        }
+        
+        .info-card p {
+            margin: 5px 0;
+            color: #6c757d;
+        }
+        
+        .log-container {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            background: #f8f9fa;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        
+        .log-entry {
+            margin-bottom: 5px;
+            padding: 2px 0;
+        }
+        
+        .log-success { color: #28a745; }
+        .log-error { color: #dc3545; }
+        .log-info { color: #17a2b8; }
+        .log-warning { color: #ffc107; }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .stat-card {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007bff;
+        }
+        
+        .stat-label {
+            color: #6c757d;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        
+        .alert {
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        
+        .alert-info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔄 Sincronização SECRIMPO</h1>
+            <p>Sincronize seus dados locais com o servidor central</p>
+        </div>
+        
+        <div class="content">
+            <!-- Status Bar -->
+            <div class="status-bar">
+                <div class="connection-status">
+                    <span id="connection-status">🔴 Verificando...</span>
+                </div>
+                <div class="user-info">
+                    <label for="usuario-input">Usuário:</label>
+                    <input type="text" id="usuario-input" class="user-input" placeholder="Digite seu nome/ID">
+                    <button onclick="definirUsuario()" class="btn btn-secondary">Definir</button>
+                </div>
+            </div>
+            
+            <!-- Alertas -->
+            <div id="alert-container"></div>
+            
+            <!-- Seção de Sincronização -->
+            <div class="sync-section">
+                <h3>Sincronização de Dados</h3>
+                
+                <div class="sync-actions">
+                    <button id="sync-button" onclick="executarSincronizacao()" class="btn btn-primary" disabled>
+                        🔄 Sincronizar Agora
+                    </button>
+                    <button onclick="verificarStatus()" class="btn btn-secondary">
+                        📊 Verificar Status
+                    </button>
+                    <button onclick="mostrarHistorico()" class="btn btn-secondary">
+                        📋 Ver Histórico
+                    </button>
+                </div>
+                
+                <!-- Informações da Última Sincronização -->
+                <div id="last-sync-info" class="info-card" style="display: none;">
+                    <h4>Última Sincronização</h4>
+                    <p id="last-sync-time">-</p>
+                    <p id="last-sync-details">-</p>
+                </div>
+                
+                <!-- Estatísticas -->
+                <div id="stats-container" style="display: none;">
+                    <h4>Estatísticas de Sincronização</h4>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number" id="stat-total-syncs">-</div>
+                            <div class="stat-label">Total de Sincronizações</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="stat-total-records">-</div>
+                            <div class="stat-label">Registros Sincronizados</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="stat-last-status">-</div>
+                            <div class="stat-label">Status da Última Sync</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Log de Atividades -->
+            <div class="sync-section">
+                <h3>Log de Atividades</h3>
+                <div id="log-container" class="log-container">
+                    <div class="log-entry log-info">Sistema iniciado. Aguardando ações...</div>
+                </div>
+                <div style="margin-top: 10px;">
+                    <button onclick="limparLog()" class="btn btn-secondary">Limpar Log</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="sync-manager.js"></script>
+    <script>
+        // Variáveis globais
+        let syncManager = window.syncManager;
+        
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            inicializar();
+        });
+        
+        function inicializar() {
+            log('Sistema de sincronização iniciado', 'info');
+            
+            // Carregar usuário salvo
+            const usuarioSalvo = syncManager.getUsuario();
+            if (usuarioSalvo) {
+                document.getElementById('usuario-input').value = usuarioSalvo;
+                log(`Usuário carregado: ${usuarioSalvo}`, 'info');
+            }
+            
+            // Verificar conectividade inicial
+            setTimeout(() => {
+                verificarConectividade();
+            }, 1000);
+            
+            // Carregar informações da última sincronização
+            carregarInfoUltimaSync();
+        }
+        
+        function definirUsuario() {
+            const input = document.getElementById('usuario-input');
+            const usuario = input.value.trim();
+            
+            if (!usuario) {
+                mostrarAlerta('Por favor, digite um nome de usuário válido', 'error');
+                return;
+            }
+            
+            syncManager.setUsuario(usuario);
+            log(`Usuário definido: ${usuario}`, 'success');
+            mostrarAlerta(`Usuário definido como: ${usuario}`, 'success');
+            
+            // Verificar status após definir usuário
+            setTimeout(verificarStatus, 500);
+        }
+        
+        async function verificarConectividade() {
+            log('Verificando conectividade...', 'info');
+            const online = await syncManager.checkConnectivity();
+            
+            if (online) {
+                log('Conectado ao servidor central', 'success');
+            } else {
+                log('Sem conexão com o servidor central', 'error');
+                mostrarAlerta('Sem conexão com o servidor. Verifique se a API está rodando.', 'error');
+            }
+        }
+        
+        async function executarSincronizacao() {
+            const usuario = syncManager.getUsuario();
+            if (!usuario) {
+                mostrarAlerta('Defina um usuário antes de sincronizar', 'error');
+                return;
+            }
+            
+            if (!syncManager.isOnline) {
+                mostrarAlerta('Sem conexão com o servidor', 'error');
+                return;
+            }
+            
+            try {
+                log('Iniciando sincronização...', 'info');
+                limparAlertas();
+                
+                const resultado = await syncManager.sincronizar(true);
+                
+                if (resultado.sucesso) {
+                    log('Sincronização concluída com sucesso', 'success');
+                    log(`Resultado: ${resultado.message}`, 'info');
+                    mostrarAlerta(resultado.message, 'success');
+                    
+                    // Mostrar detalhes se houver
+                    if (resultado.detalhes && resultado.detalhes.length > 0) {
+                        resultado.detalhes.forEach(detalhe => {
+                            log(`- ${detalhe}`, 'info');
+                        });
+                    }
+                    
+                    // Mostrar erros se houver
+                    if (resultado.erros && resultado.erros.length > 0) {
+                        resultado.erros.forEach(erro => {
+                            log(`⚠️ ${erro}`, 'warning');
+                        });
+                    }
+                } else {
+                    log('Sincronização falhou', 'error');
+                    mostrarAlerta('Falha na sincronização. Verifique o log para detalhes.', 'error');
+                }
+                
+                // Atualizar informações
+                carregarInfoUltimaSync();
+                setTimeout(verificarStatus, 1000);
+                
+            } catch (error) {
+                log(`Erro durante sincronização: ${error.message}`, 'error');
+                mostrarAlerta(`Erro: ${error.message}`, 'error');
+            }
+        }
+        
+        async function verificarStatus() {
+            const usuario = syncManager.getUsuario();
+            if (!usuario || !syncManager.isOnline) {
+                return;
+            }
+            
+            try {
+                log('Verificando status no servidor...', 'info');
+                const status = await syncManager.obterStatusSincronizacao();
+                
+                if (status) {
+                    // Atualizar estatísticas
+                    document.getElementById('stat-total-syncs').textContent = status.total_sincronizacoes;
+                    document.getElementById('stat-total-records').textContent = status.total_registros_sincronizados;
+                    document.getElementById('stat-last-status').textContent = status.status_ultima_sync;
+                    
+                    document.getElementById('stats-container').style.display = 'block';
+                    
+                    log(`Status obtido: ${status.total_sincronizacoes} sincronizações, ${status.total_registros_sincronizados} registros`, 'success');
+                } else {
+                    log('Nenhum histórico de sincronização encontrado', 'info');
+                }
+            } catch (error) {
+                log(`Erro ao verificar status: ${error.message}`, 'error');
+            }
+        }
+        
+        async function mostrarHistorico() {
+            const usuario = syncManager.getUsuario();
+            if (!usuario || !syncManager.isOnline) {
+                mostrarAlerta('Usuário não definido ou sem conexão', 'error');
+                return;
+            }
+            
+            try {
+                log('Carregando histórico...', 'info');
+                const historico = await syncManager.obterHistoricoSincronizacao(5);
+                
+                if (historico && historico.length > 0) {
+                    log('=== HISTÓRICO DE SINCRONIZAÇÕES ===', 'info');
+                    historico.forEach((sync, index) => {
+                        const data = new Date(sync.timestamp).toLocaleString('pt-BR');
+                        log(`${index + 1}. ${data} - ${sync.registros_novos} novos, ${sync.registros_duplicados} duplicados (${sync.status})`, 'info');
+                    });
+                    log('=== FIM DO HISTÓRICO ===', 'info');
+                } else {
+                    log('Nenhum histórico encontrado', 'info');
+                }
+            } catch (error) {
+                log(`Erro ao carregar histórico: ${error.message}`, 'error');
+            }
+        }
+        
+        function carregarInfoUltimaSync() {
+            const lastSync = syncManager.getLastSyncInfo();
+            if (lastSync) {
+                const infoDiv = document.getElementById('last-sync-info');
+                const timeSpan = document.getElementById('last-sync-time');
+                const detailsSpan = document.getElementById('last-sync-details');
+                
+                timeSpan.textContent = lastSync.toLocaleString('pt-BR');
+                
+                const agora = new Date();
+                const diffMinutos = Math.floor((agora - lastSync) / (1000 * 60));
+                
+                if (diffMinutos < 60) {
+                    detailsSpan.textContent = `Há ${diffMinutos} minutos`;
+                } else if (diffMinutos < 1440) {
+                    detailsSpan.textContent = `Há ${Math.floor(diffMinutos / 60)} horas`;
+                } else {
+                    detailsSpan.textContent = `Há ${Math.floor(diffMinutos / 1440)} dias`;
+                }
+                
+                infoDiv.style.display = 'block';
+            }
+        }
+        
+        function log(message, type = 'info') {
+            const container = document.getElementById('log-container');
+            const entry = document.createElement('div');
+            entry.className = `log-entry log-${type}`;
+            
+            const timestamp = new Date().toLocaleTimeString('pt-BR');
+            entry.textContent = `[${timestamp}] ${message}`;
+            
+            container.appendChild(entry);
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        function limparLog() {
+            const container = document.getElementById('log-container');
+            container.innerHTML = '<div class="log-entry log-info">Log limpo</div>';
+        }
+        
+        function mostrarAlerta(message, type) {
+            const container = document.getElementById('alert-container');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            
+            container.appendChild(alert);
+            
+            // Remover após 5 segundos
+            setTimeout(() => {
+                if (alert.parentNode) {
+                    alert.parentNode.removeChild(alert);
+                }
+            }, 5000);
+        }
+        
+        function limparAlertas() {
+            const container = document.getElementById('alert-container');
+            container.innerHTML = '';
+        }
+        
+        // Verificar conectividade periodicamente
+        setInterval(verificarConectividade, 30000);
+    </script>
+</body>
+</html>
