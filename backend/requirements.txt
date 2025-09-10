@@ -1,17 +1,32 @@
+
 # FastAPI e dependências
-fastapi
-uvicorn[standard]
-python-multipart
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+python-multipart>=0.0.6
 
 # Banco de dados
-sqlalchemy
+sqlalchemy>=2.0.0
 
 # Validação de dados
-pydantic
+pydantic>=2.0.0
 
 # Exportação e manipulação de dados
-pandas
-openpyxl
+pandas>=2.0.0
+openpyxl>=3.1.0
+
+# Testes e requisições HTTP
+requests>=2.31.0
 
 # Utilitários
-python-dateutil
+python-dateutil>=2.8.0
+
+# Dependências adicionais para desenvolvimento
+pytest>=7.0.0
+pytest-asyncio>=0.21.0
+httpx>=0.25.0
+
+# Logging e monitoramento
+structlog>=23.0.0
+
+# Validação de dados adicional
+email-validator>=2.0.0
