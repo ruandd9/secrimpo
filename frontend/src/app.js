@@ -655,10 +655,45 @@ function validateForm() {
     return isValid;
 }
 
+// Auto-resize para textareas
+function autoResizeTextarea(textarea) {
+    textarea.style.height = 'auto';
+    textarea.style.height = textarea.scrollHeight + 'px';
+}
+
+// Configura auto-resize para todas as textareas
+function setupTextareaAutoResize() {
+    // Para textareas existentes
+    document.querySelectorAll('textarea').forEach(textarea => {
+        autoResizeTextarea(textarea);
+        textarea.addEventListener('input', () => autoResizeTextarea(textarea));
+    });
+    
+    // Observer para textareas adicionadas dinamicamente
+    const observer = new MutationObserver(mutations => {
+        mutations.forEach(mutation => {
+            mutation.addedNodes.forEach(node => {
+                if (node.nodeType === 1) { // Element node
+                    const textareas = node.querySelectorAll ? node.querySelectorAll('textarea') : [];
+                    textareas.forEach(textarea => {
+                        autoResizeTextarea(textarea);
+                        textarea.addEventListener('input', () => autoResizeTextarea(textarea));
+                    });
+                }
+            });
+        });
+    });
+    
+    observer.observe(document.body, { childList: true, subtree: true });
+}
+
 // Inicializa primeira espécie/item
 document.addEventListener('DOMContentLoaded', () => {
     updateRemoveButtons();
     
     // Inicializa máscara de documento
     updateDocumentMask();
+    
+    // Configura auto-resize para textareas
+    setupTextareaAutoResize();
 });
