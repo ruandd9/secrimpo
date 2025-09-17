@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,18 +8,19 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
     <!-- Header -->
     <header class="header">
         <div class="header-left">
-            <img src="../assets/logo-pm.png" alt="Polícia Militar" class="logo">
+            <img src="../assets/img/logo-pmdf.svg" alt="Polícia Militar" class="logo logo-pmdf">
         </div>
         <div class="header-center">
             <h1>SECRIMPO</h1>
             <p>TERMO DE APREENSÃO 4ª CPR - PMDF</p>
         </div>
         <div class="header-right">
-            <img src="../assets/logo-gdf.png" alt="GDF" class="logo">
+            <img src="../assets/img/logo-gdf.svg" alt="GDF" class="logo">
         </div>
     </header>
 
@@ -42,7 +44,8 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label for="numeroGenesis">Número Gênesis</label>
-                        <input type="text" id="numeroGenesis" name="numeroGenesis" placeholder="Digite o número Gênesis" required>
+                        <input type="text" id="numeroGenesis" name="numeroGenesis" placeholder="Digite o número Gênesis"
+                            required>
                     </div>
                     <div class="form-group">
                         <label for="unidadeFato">Unidade do Fato</label>
@@ -61,7 +64,8 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label for="leiInfringida">Lei Infringida</label>
-                        <input type="text" id="leiInfringida" name="leiInfringida" placeholder="Digite a lei infringida" required>
+                        <input type="text" id="leiInfringida" name="leiInfringida" placeholder="Digite a lei infringida"
+                            required>
                     </div>
                     <div class="form-group">
                         <label for="artigo">Artigo</label>
@@ -102,13 +106,16 @@
                             </div>
                             <div class="form-group full-width">
                                 <label for="descricao_0">Descrição</label>
-                                <textarea id="descricao_0" name="descricao_0" placeholder="Descrição Detalhada" rows="3" required></textarea>
+                                <textarea id="descricao_0" name="descricao_0" placeholder="Descrição Detalhada" rows="3"
+                                    required></textarea>
                             </div>
                         </div>
-                        <button type="button" class="btn-remove-item" onclick="removeItem(0)" style="display: none;"><i class="fas fa-times"></i></button>
+                        <button type="button" class="btn-remove-item" onclick="removeItem(0)" style="display: none;"><i
+                                class="fas fa-times"></i></button>
                     </div>
                 </div>
-                <button type="button" class="btn-add-item" onclick="addItem()"><i class="fas fa-plus"></i> Adicionar Item</button>
+                <button type="button" class="btn-add-item" onclick="addItem()"><i class="fas fa-plus"></i> Adicionar
+                    Item</button>
             </section>
 
             <!-- Dados do Proprietário -->
@@ -117,7 +124,8 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label for="proprietarioNome">Nome</label>
-                        <input type="text" id="proprietarioNome" name="proprietarioNome" placeholder="Digite o nome" required>
+                        <input type="text" id="proprietarioNome" name="proprietarioNome" placeholder="Digite o nome"
+                            required>
                     </div>
                     <div class="form-group">
                         <label for="tipoDocumento">Tipo de Documento</label>
@@ -129,13 +137,16 @@
                     </div>
                     <div class="form-group">
                         <label for="proprietarioDocumento">Documento</label>
-                        <input type="text" id="proprietarioDocumento" name="proprietarioDocumento" placeholder="Digite o documento" required>
+                        <input type="text" id="proprietarioDocumento" name="proprietarioDocumento"
+                            placeholder="Digite o documento" required>
                         <small id="documentoHint" class="input-hint"></small>
                     </div>
                 </div>
                 <div class="proprietario-actions">
-                    <button type="button" class="btn-secondary" onclick="buscarProprietario()"><i class="fas fa-search"></i> Buscar</button>
-                    <button type="button" class="btn-secondary" onclick="novoProprietario()"><i class="fas fa-plus"></i> Novo</button>
+                    <button type="button" class="btn-secondary" onclick="buscarProprietario()"><i
+                            class="fas fa-search"></i> Buscar</button>
+                    <button type="button" class="btn-secondary" onclick="novoProprietario()"><i class="fas fa-plus"></i>
+                        Novo</button>
                 </div>
             </section>
 
@@ -149,7 +160,8 @@
                     </div>
                     <div class="form-group">
                         <label for="policialMatricula">Matrícula</label>
-                        <input type="text" id="policialMatricula" name="policialMatricula" placeholder="Digite a matrícula" required>
+                        <input type="text" id="policialMatricula" name="policialMatricula"
+                            placeholder="Digite a matrícula" required>
                     </div>
                 </div>
                 <div class="form-row">
@@ -183,7 +195,8 @@
                     </div>
                 </div>
                 <div class="policial-actions">
-                    <button type="button" class="btn-secondary" onclick="buscarPolicial()"><i class="fas fa-search"></i> Buscar</button>
+                    <button type="button" class="btn-secondary" onclick="buscarPolicial()"><i class="fas fa-search"></i>
+                        Buscar</button>
                 </div>
             </section>
 
@@ -205,4 +218,5 @@
 
     <script src="app.js"></script>
 </body>
+
 </html>
