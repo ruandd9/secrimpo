@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SECRIMPO - Login</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .login-container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1), 0 5px 15px rgba(0,0,0,0.07);
+            max-width: 450px;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .login-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #1e3c72, #2a5298, #1e3c72);
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+        
+        .logo h1 {
+            color: #1e3c72;
+            margin: 0;
+            font-size: 2.2em;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        
+        .logo p {
+            color: #666;
+            margin-top: 5px;
+            font-size: 0.95em;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #fafbfc;
+        }
+        
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #2a5298;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(42, 82, 152, 0.1);
+        }
+        
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-login:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(30, 60, 114, 0.3);
+        }
+        
+        .btn-login:active {
+            transform: translateY(0);
+        }
+        
+        .btn-login:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .message {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: 500;
+        }
+        
+        .error-message {
+            background: #fee;
+            color: #c53030;
+            border: 1px solid #fecaca;
+        }
+        
+        .success-message {
+            background: #f0fff4;
+            color: #22543d;
+            border: 1px solid #c6f6d5;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 15px;
+            color: #666;
+        }
+        
+        .loading::after {
+            content: '...';
+            animation: dots 1.5s infinite;
+        }
+        
+        @keyframes dots {
+            0%, 20% { color: transparent; text-shadow: .25em 0 0 transparent, .5em 0 0 transparent; }
+            40% { color: #666; text-shadow: .25em 0 0 transparent, .5em 0 0 transparent; }
+            60% { text-shadow: .25em 0 0 #666, .5em 0 0 transparent; }
+            80%, 100% { text-shadow: .25em 0 0 #666, .5em 0 0 #666; }
+        }
+        
+        .info-section {
+            margin-top: 30px;
+            padding-top: 25px;
+            border-top: 1px solid #e1e5e9;
+            text-align: center;
+        }
+        
+        .info-section h3 {
+            color: #1e3c72;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+        
+        .subscription-levels {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            font-size: 0.85em;
+        }
+        
+        .subscription-item {
+            padding: 8px 12px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            border-left: 3px solid #2a5298;
+        }
+        
+        .subscription-item strong {
+            color: #1e3c72;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">
+            <h1>🔒 SECRIMPO</h1>
+            <p>Sistema de Registro de Ocorrências Policiais</p>
+        </div>
+        
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="licenseKey">Chave de Licença KeyAuth:</label>
+                <input 
+                    type="text" 
+                    id="licenseKey" 
+                    name="licenseKey" 
+                    placeholder="Digite sua chave de licença"
+                    required
+                    autocomplete="off"
+                >
+            </div>
+            
+            <button type="submit" class="btn-login" id="loginBtn">
+                Entrar no Sistema
+            </button>
+            
+            <div id="message"></div>
+            <div id="loading" class="loading">
+                Validando licença
+            </div>
+        </form>
+        
+        <div class="info-section">
+            <h3>📊 Níveis de Acesso</h3>
+            <div class="subscription-levels">
+                <div class="subscription-item">
+                    <strong>👑 Admin:</strong> Acesso completo ao sistema
+                </div>
+                <div class="subscription-item">
+                    <strong>🎖️ Agent:</strong> Criar e editar ocorrências
+                </div>
+                <div class="subscription-item">
+                    <strong>👁️ Viewer:</strong> Apenas visualização
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="auth.js"></script>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const licenseKey = document.getElementById('licenseKey').value.trim();
+            const loginBtn = document.getElementById('loginBtn');
+            const loading = document.getElementById('loading');
+            const message = document.getElementById('message');
+            
+            if (!licenseKey) {
+                showMessage('Por favor, digite a chave de licença', 'error');
+                return;
+            }
+            
+            // Show loading state
+            loginBtn.disabled = true;
+            loading.style.display = 'block';
+            message.innerHTML = '';
+            loginBtn.textContent = 'Validando...';
+            
+            try {
+                const result = await authManager.authenticate(licenseKey);
+                
+                if (result.success) {
+                    showMessage(`✅ Login realizado com sucesso! Bem-vindo, ${result.data.user.username}`, 'success');
+                    
+                    // Show user info
+                    setTimeout(() => {
+                        showMessage(`🔄 Redirecionando para o sistema...`, 'success');
+                    }, 1000);
+                    
+                    // Redirect to main application after 2 seconds
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 2000);
+                } else {
+                    showMessage(`❌ Erro: ${result.error}`, 'error');
+                }
+            } catch (error) {
+                showMessage(`🌐 Erro de conexão: ${error.message}`, 'error');
+            } finally {
+                loginBtn.disabled = false;
+                loading.style.display = 'none';
+                loginBtn.textContent = 'Entrar no Sistema';
+            }
+        });
+        
+        function showMessage(text, type) {
+            const message = document.getElementById('message');
+            message.innerHTML = text;
+            message.className = `message ${type === 'error' ? 'error-message' : 'success-message'}`;
+        }
+        
+        // Check if already authenticated
+        window.addEventListener('load', async () => {
+            console.log('🔍 Checking existing authentication...');
+            
+            if (await authManager.checkAuthStatus()) {
+                console.log('✅ User already authenticated, redirecting...');
+                showMessage('✅ Já autenticado! Redirecionando...', 'success');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1000);
+            } else {
+                console.log('❌ No valid authentication found');
+            }
+        });
+        
+        // Handle Enter key
+        document.getElementById('licenseKey').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                document.getElementById('loginForm').dispatchEvent(new Event('submit'));
+            }
+        });
+    </script>
+</body>
+</html>

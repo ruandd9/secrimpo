@@ -1,0 +1,1 @@
+# Auth module for SECRIMPO KeyAuth integration

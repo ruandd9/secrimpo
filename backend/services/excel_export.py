@@ -4,6 +4,7 @@ from datetime import datetime, date
 from typing import List, Optional
 import os
 import sys
+from pathlib import Path
 
 # Adiciona o diretório raiz ao path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
@@ -12,23 +13,32 @@ from models.ocorrencia import Ocorrencia
 from models.policial import Policial
 from models.proprietario import Proprietario
 from models.item_apreendido import ItemApreendido
-from backend.services.crud_service import get_ocorrencias_por_periodo
+from config import EXPORTS_DIR
 
 class ExcelExportService:
     def __init__(self, db: Session):
         self.db = db
-        self.export_dir = "exports"
-        
-        # Cria diretório de exports se não existir
-        if not os.path.exists(self.export_dir):
-            os.makedirs(self.export_dir)
+        # Usa diretório de exportação centralizado (compartilhado quando disponível)
+        self.export_dir = Path(EXPORTS_DIR)
+        self.export_dir.mkdir(exist_ok=True)
+
+    def _build_path(self, filename: str) -> str:
+        """Monta o caminho absoluto do arquivo no diretório de exportação."""
+        return str(self.export_dir / filename)
+    
+    def get_ocorrencias_por_periodo(self, data_inicio: date, data_fim: date):
+        """Busca ocorrências em um período específico"""
+        return self.db.query(Ocorrencia).filter(
+            Ocorrencia.data_apreensao >= data_inicio,
+            Ocorrencia.data_apreensao <= data_fim
+        ).all()
     
     def export_ocorrencias_completo(self, data_inicio: date, data_fim: date) -> str:
         """
         Exporta relatório completo de ocorrências com todos os dados relacionados
         """
         # Busca ocorrências no período
-        ocorrencias = get_ocorrencias_por_periodo(self.db, data_inicio, data_fim)
+        ocorrencias = self.get_ocorrencias_por_periodo(data_inicio, data_fim)
         
         if not ocorrencias:
             raise ValueError("Nenhuma ocorrência encontrada no período especificado")
@@ -84,7 +94,7 @@ class ExcelExportService:
         
         # Nome do arquivo
         nome_arquivo = f"relatorio_completo_{data_inicio.strftime('%Y%m%d')}_{data_fim.strftime('%Y%m%d')}.xlsx"
-        caminho_arquivo = os.path.join(self.export_dir, nome_arquivo)
+        caminho_arquivo = self._build_path(nome_arquivo)
         
         # Exporta para Excel com formatação
         with pd.ExcelWriter(caminho_arquivo, engine='openpyxl') as writer:
@@ -118,7 +128,7 @@ class ExcelExportService:
             data_fim = date(ano, mes + 1, 1)
         
         # Busca ocorrências
-        ocorrencias = get_ocorrencias_por_periodo(self.db, data_inicio, data_fim)
+        ocorrencias = self.get_ocorrencias_por_periodo(data_inicio, data_fim)
         
         if not ocorrencias:
             raise ValueError(f"Nenhuma ocorrência encontrada em {mes:02d}/{ano}")
@@ -159,7 +169,7 @@ class ExcelExportService:
         
         # Nome do arquivo
         nome_arquivo = f"resumo_mensal_{ano}_{mes:02d}.xlsx"
-        caminho_arquivo = os.path.join(self.export_dir, nome_arquivo)
+        caminho_arquivo = self._build_path(nome_arquivo)
         
         # Exporta para Excel
         with pd.ExcelWriter(caminho_arquivo, engine='openpyxl') as writer:
@@ -223,7 +233,7 @@ class ExcelExportService:
         
         # Nome do arquivo
         nome_arquivo = f"relatorio_{policial.nome.replace(' ', '_')}_{data_inicio.strftime('%Y%m%d')}_{data_fim.strftime('%Y%m%d')}.xlsx"
-        caminho_arquivo = os.path.join(self.export_dir, nome_arquivo)
+        caminho_arquivo = self._build_path(nome_arquivo)
         
         # Exporta para Excel
         with pd.ExcelWriter(caminho_arquivo, engine='openpyxl') as writer:
@@ -250,7 +260,7 @@ class ExcelExportService:
         Exporta planilha com estatísticas do período
         """
         # Busca dados
-        ocorrencias = get_ocorrencias_por_periodo(self.db, data_inicio, data_fim)
+        ocorrencias = self.get_ocorrencias_por_periodo(data_inicio, data_fim)
         
         if not ocorrencias:
             raise ValueError("Nenhuma ocorrência encontrada no período")
@@ -285,7 +295,7 @@ class ExcelExportService:
         
         # Nome do arquivo
         nome_arquivo = f"estatisticas_{data_inicio.strftime('%Y%m%d')}_{data_fim.strftime('%Y%m%d')}.xlsx"
-        caminho_arquivo = os.path.join(self.export_dir, nome_arquivo)
+        caminho_arquivo = self._build_path(nome_arquivo)
         
         # Cria planilha com múltiplas abas
         with pd.ExcelWriter(caminho_arquivo, engine='openpyxl') as writer:

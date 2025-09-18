@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from sqlalchemy import create_engine, Column, Integer, String, Date, ForeignKey
@@ -10,16 +10,16 @@ from datetime import date
 import os
 from config import UNIDADES_DISPONIVEIS
 
-# Configuração do banco de dados (usando config.py)
-from config import DATABASE_URL, SHARED_MODE, SQLITE_CONFIG
+# Import authentication
+from auth.middleware import verify_license, require_permission, AuthContext, optional_verify_license
+from auth.keyauth_config import auth_manager
 
-# Criar engine com configurações apropriadas
-if SHARED_MODE:
-    engine = create_engine(DATABASE_URL, echo=True, **SQLITE_CONFIG)
-    print(f"[CHECK] Usando banco compartilhado: {DATABASE_URL}")
-else:
-    engine = create_engine(DATABASE_URL, echo=True)
-    print(f"[INFO] Usando banco local: {DATABASE_URL}")
+# Configuração do banco de dados (usando config.py)
+from config import DATABASE_URL
+
+# Criar engine
+engine = create_engine(DATABASE_URL, echo=True)
+print(f"[INFO] Usando banco de dados: {DATABASE_URL}")
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
@@ -163,9 +163,36 @@ def get_db():
 async def root():
     return {"message": "SECRIMPO API está funcionando!", "version": "1.0.0"}
 
+# === AUTHENTICATION ENDPOINTS ===
+@app.post("/auth/validate")
+async def validate_auth(auth: AuthContext = Depends(verify_license)):
+    """Validate authentication token and return user permissions"""
+    return {
+        "valid": True,
+        "user": {
+            "username": auth.username,
+            "subscription": auth.subscription,
+            "expires": auth.expires,
+            "created_at": auth.created_at,
+            "last_login": auth.last_login
+        },
+        "permissions": auth.permissions
+    }
+
+@app.get("/auth/user-info")
+async def get_user_info(auth: AuthContext = Depends(verify_license)):
+    """Get current user information"""
+    return {
+        "username": auth.username,
+        "subscription": auth.subscription,
+        "permissions": auth.permissions,
+        "expires": auth.expires
+    }
+
 # POLICIAIS
 @app.post("/policiais/", response_model=PolicialResponse)
-async def criar_policial(policial: PolicialCreate, db: Session = Depends(get_db)):
+@require_permission("create_occurrence")
+async def criar_policial(policial: PolicialCreate, db: Session = Depends(get_db), auth: AuthContext = Depends(verify_license)):
     # Verifica se matrícula já existe
     existing = db.query(Policial).filter(Policial.matricula == policial.matricula).first()
     if existing:
@@ -175,14 +202,20 @@ async def criar_policial(policial: PolicialCreate, db: Session = Depends(get_db)
     db.add(db_policial)
     db.commit()
     db.refresh(db_policial)
+    
+    # Log action
+    auth_manager.log_user_action(auth.username, "CREATE_POLICIAL", f"Matricula: {policial.matricula}")
+    
     return db_policial
 
 @app.get("/policiais/", response_model=List[PolicialResponse])
-async def listar_policiais(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+@require_permission("view_all_occurrences")
+async def listar_policiais(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), auth: AuthContext = Depends(verify_license)):
     return db.query(Policial).offset(skip).limit(limit).all()
 
 @app.get("/policiais/{policial_id}", response_model=PolicialResponse)
-async def obter_policial(policial_id: int, db: Session = Depends(get_db)):
+@require_permission("view_all_occurrences")
+async def obter_policial(policial_id: int, db: Session = Depends(get_db), auth: AuthContext = Depends(verify_license)):
     policial = db.query(Policial).filter(Policial.id == policial_id).first()
     if not policial:
         raise HTTPException(status_code=404, detail="Policial não encontrado")
@@ -190,20 +223,27 @@ async def obter_policial(policial_id: int, db: Session = Depends(get_db)):
 
 # PROPRIETÁRIOS
 @app.post("/proprietarios/", response_model=ProprietarioResponse)
-async def criar_proprietario(proprietario: ProprietarioCreate, db: Session = Depends(get_db)):
+@require_permission("create_occurrence")
+async def criar_proprietario(proprietario: ProprietarioCreate, db: Session = Depends(get_db), auth: AuthContext = Depends(verify_license)):
     db_proprietario = Proprietario(**proprietario.dict())
     db.add(db_proprietario)
     db.commit()
     db.refresh(db_proprietario)
+    
+    # Log action
+    auth_manager.log_user_action(auth.username, "CREATE_PROPRIETARIO", f"Documento: {proprietario.documento}")
+    
     return db_proprietario
 
 @app.get("/proprietarios/", response_model=List[ProprietarioResponse])
-async def listar_proprietarios(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+@require_permission("view_all_occurrences")
+async def listar_proprietarios(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), auth: AuthContext = Depends(verify_license)):
     return db.query(Proprietario).offset(skip).limit(limit).all()
 
 # OCORRÊNCIAS
 @app.post("/ocorrencias/", response_model=OcorrenciaResponse)
-async def criar_ocorrencia(ocorrencia: OcorrenciaCreate, db: Session = Depends(get_db)):
+@require_permission("create_occurrence")
+async def criar_ocorrencia(ocorrencia: OcorrenciaCreate, db: Session = Depends(get_db), auth: AuthContext = Depends(verify_license)):
     # Verifica se policial existe
     policial = db.query(Policial).filter(Policial.id == ocorrencia.policial_condutor_id).first()
     if not policial:
@@ -213,15 +253,21 @@ async def criar_ocorrencia(ocorrencia: OcorrenciaCreate, db: Session = Depends(g
     db.add(db_ocorrencia)
     db.commit()
     db.refresh(db_ocorrencia)
+    
+    # Log action
+    auth_manager.log_user_action(auth.username, "CREATE_OCORRENCIA", f"Genesis: {ocorrencia.numero_genesis}")
+    
     return db_ocorrencia
 
 @app.get("/ocorrencias/", response_model=List[OcorrenciaResponse])
-async def listar_ocorrencias(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+@require_permission("view_all_occurrences")
+async def listar_ocorrencias(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), auth: AuthContext = Depends(verify_license)):
     return db.query(Ocorrencia).offset(skip).limit(limit).all()
 
 # ITENS APREENDIDOS
 @app.post("/itens/", response_model=ItemApreendidoResponse)
-async def criar_item(item: ItemApreendidoCreate, db: Session = Depends(get_db)):
+@require_permission("create_occurrence")
+async def criar_item(item: ItemApreendidoCreate, db: Session = Depends(get_db), auth: AuthContext = Depends(verify_license)):
     # Verifica se todas as referências existem
     ocorrencia = db.query(Ocorrencia).filter(Ocorrencia.id == item.ocorrencia_id).first()
     if not ocorrencia:
@@ -239,14 +285,20 @@ async def criar_item(item: ItemApreendidoCreate, db: Session = Depends(get_db)):
     db.add(db_item)
     db.commit()
     db.refresh(db_item)
+    
+    # Log action
+    auth_manager.log_user_action(auth.username, "CREATE_ITEM", f"Item: {item.item}, Qtd: {item.quantidade}")
+    
     return db_item
 
 @app.get("/itens/", response_model=List[ItemApreendidoResponse])
-async def listar_itens(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+@require_permission("view_all_occurrences")
+async def listar_itens(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), auth: AuthContext = Depends(verify_license)):
     return db.query(ItemApreendido).offset(skip).limit(limit).all()
 
 @app.get("/itens/ocorrencia/{ocorrencia_id}", response_model=List[ItemApreendidoResponse])
-async def listar_itens_por_ocorrencia(ocorrencia_id: int, db: Session = Depends(get_db)):
+@require_permission("view_all_occurrences")
+async def listar_itens_por_ocorrencia(ocorrencia_id: int, db: Session = Depends(get_db), auth: AuthContext = Depends(verify_license)):
     return db.query(ItemApreendido).filter(ItemApreendido.ocorrencia_id == ocorrencia_id).all()
 
 # UNIDADES DISPONÍVEIS
@@ -256,11 +308,15 @@ async def obter_unidades():
 
 # ESTATÍSTICAS
 @app.get("/estatisticas/")
-async def obter_estatisticas(db: Session = Depends(get_db)):
+@require_permission("view_statistics")
+async def obter_estatisticas(db: Session = Depends(get_db), auth: AuthContext = Depends(verify_license)):
     total_ocorrencias = db.query(Ocorrencia).count()
     total_policiais = db.query(Policial).count()
     total_proprietarios = db.query(Proprietario).count()
     total_itens = db.query(ItemApreendido).count()
+    
+    # Log access
+    auth_manager.log_user_action(auth.username, "VIEW_STATISTICS", "Accessed system statistics")
     
     return {
         "total_ocorrencias": total_ocorrencias,
@@ -269,119 +325,102 @@ async def obter_estatisticas(db: Session = Depends(get_db)):
         "total_itens": total_itens
     }
 
-# === ENDPOINTS DE SINCRONIZAÇÃO ===
-import sys
-import os
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-
-from services.sync_service import SyncService
-from models.sync_models import SincronizacaoRequest, SincronizacaoResponse, StatusSincronizacao, SyncLog, RegistroSincronizado
-from datetime import datetime
-from typing import Dict, Any
-
-# Adicionar tabelas de sincronização ao metadata
-from models.sync_models import Base as SyncBase
-SyncBase.metadata.create_all(bind=engine)
-
-@app.post("/sincronizar", response_model=Dict[str, Any])
-async def sincronizar_dados(request: Dict[str, Any], db: Session = Depends(get_db)):
-    """
-    Endpoint principal para sincronização de dados do cliente local
-    
-    Exemplo de payload:
-    {
-        "usuario": "agente_joao",
-        "client_uuid": "uuid-do-cliente",
-        "timestamp_cliente": "2025-09-01T10:00:00",
-        "dados": {
-            "policiais": [...],
-            "proprietarios": [...],
-            "ocorrencias": [...]
-        }
-    }
-    """
-    try:
-        # Validar campos obrigatórios
-        usuario = request.get("usuario")
-        client_uuid = request.get("client_uuid")
-        dados = request.get("dados", {})
-        
-        if not usuario:
-            raise HTTPException(status_code=400, detail="Campo 'usuario' é obrigatório")
-        
-        if not client_uuid:
-            raise HTTPException(status_code=400, detail="Campo 'client_uuid' é obrigatório")
-        
-        if not dados:
-            raise HTTPException(status_code=400, detail="Campo 'dados' não pode estar vazio")
-        
-        # Executar sincronização
-        sync_service = SyncService(db)
-        resultado = sync_service.sincronizar_dados(usuario, client_uuid, dados)
-        
-        # Adicionar timestamp do servidor
-        resultado["timestamp_servidor"] = datetime.utcnow()
-        resultado["usuario"] = usuario
-        
-        return resultado
-        
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Erro interno do servidor: {str(e)}")
-
-@app.get("/sincronizar/status/{usuario}")
-async def obter_status_sincronizacao(usuario: str, db: Session = Depends(get_db)):
-    """Obtém status de sincronização de um usuário específico"""
-    try:
-        sync_service = SyncService(db)
-        status = sync_service.obter_status_sincronizacao(usuario)
-        return status
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Erro ao obter status: {str(e)}")
-
-@app.get("/sincronizar/historico/{usuario}")
-async def obter_historico_sincronizacao(usuario: str, limit: int = 10, db: Session = Depends(get_db)):
-    """Obtém histórico de sincronizações de um usuário"""
-    try:
-        historico = db.query(SyncLog).filter(
-            SyncLog.usuario == usuario
-        ).order_by(SyncLog.timestamp.desc()).limit(limit).all()
-        
-        return [
-            {
-                "id": log.id,
-                "timestamp": log.timestamp,
-                "total_registros": log.total_registros,
-                "registros_novos": log.registros_novos,
-                "registros_duplicados": log.registros_duplicados,
-                "status": log.status,
-                "detalhes": log.detalhes
-            }
-            for log in historico
-        ]
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Erro ao obter histórico: {str(e)}")
-
-@app.get("/sincronizar/usuarios")
-async def listar_usuarios_sincronizados(db: Session = Depends(get_db)):
-    """Lista todos os usuários que já sincronizaram dados"""
-    try:
-        usuarios = db.query(SyncLog.usuario).distinct().all()
-        return {"usuarios": [u[0] for u in usuarios]}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Erro ao listar usuários: {str(e)}")
-
-@app.post("/sincronizar/teste")
-async def testar_sincronizacao():
-    """Endpoint para testar conectividade de sincronização"""
-    return {
-        "status": "ok",
-        "message": "Servidor de sincronização funcionando",
-        "timestamp": datetime.utcnow(),
-        "version": "1.0.0"
-    }
-
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="127.0.0.1", port=8000, reload=True)
+
+# === ENDPOINTS DE EXPORTAÇÃO DE PLANILHAS ===
+from services.excel_export import ExcelExportService
+
+@app.get("/export/relatorio_completo")
+@require_permission("export_reports")
+async def export_relatorio_completo(
+    data_inicio: date = Query(..., description="Data inicial no formato YYYY-MM-DD"),
+    data_fim: date = Query(..., description="Data final no formato YYYY-MM-DD"),
+    db: Session = Depends(get_db),
+    auth: AuthContext = Depends(verify_license)
+):
+    try:
+        service = ExcelExportService(db)
+        caminho = service.export_ocorrencias_completo(data_inicio, data_fim)
+        nome = os.path.basename(caminho)
+        
+        # Log export action
+        auth_manager.log_user_action(
+            auth.username, 
+            "EXPORT_COMPLETE_REPORT", 
+            f"Period: {data_inicio} to {data_fim}"
+        )
+        
+        return FileResponse(
+            caminho,
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            filename=nome
+        )
+    except ValueError as ve:
+        raise HTTPException(status_code=404, detail=str(ve))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erro ao gerar exportação: {str(e)}")
+
+@app.get("/export/resumo_mensal")
+@require_permission("export_reports")
+async def export_resumo_mensal(
+    ano: int = Query(..., ge=2000, le=2100),
+    mes: int = Query(..., ge=1, le=12),
+    db: Session = Depends(get_db),
+    auth: AuthContext = Depends(verify_license)
+):
+    try:
+        service = ExcelExportService(db)
+        caminho = service.export_resumo_mensal(ano, mes)
+        nome = os.path.basename(caminho)
+        return FileResponse(
+            caminho,
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            filename=nome
+        )
+    except ValueError as ve:
+        raise HTTPException(status_code=404, detail=str(ve))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erro ao gerar exportação: {str(e)}")
+
+@app.get("/export/por_policial/{policial_id}")
+async def export_por_policial(
+    policial_id: int,
+    data_inicio: date = Query(...),
+    data_fim: date = Query(...),
+    db: Session = Depends(get_db)
+):
+    try:
+        service = ExcelExportService(db)
+        caminho = service.export_por_policial(policial_id, data_inicio, data_fim)
+        nome = os.path.basename(caminho)
+        return FileResponse(
+            caminho,
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            filename=nome
+        )
+    except ValueError as ve:
+        raise HTTPException(status_code=404, detail=str(ve))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erro ao gerar exportação: {str(e)}")
+
+@app.get("/export/estatisticas")
+async def export_estatisticas(
+    data_inicio: date = Query(...),
+    data_fim: date = Query(...),
+    db: Session = Depends(get_db)
+):
+    try:
+        service = ExcelExportService(db)
+        caminho = service.export_estatisticas(data_inicio, data_fim)
+        nome = os.path.basename(caminho)
+        return FileResponse(
+            caminho,
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            filename=nome
+        )
+    except ValueError as ve:
+        raise HTTPException(status_code=404, detail=str(ve))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erro ao gerar exportação: {str(e)}")
