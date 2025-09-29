@@ -3,43 +3,43 @@
  */
 class AuthManager {
     constructor() {
-        this.licenseKey = localStorage.getItem('secrimpo_license');
+        this.licenseKey = null;
+        this.jwtToken = localStorage.getItem('secrimpo_token');
         this.isAuthenticated = false;
         this.userPermissions = {};
         this.userInfo = {};
-        this.apiBase = 'http://127.0.0.1:8000';
+        const savedBase = localStorage.getItem('secrimpo_api_base');
+        this.apiBase = savedBase && savedBase.trim() ? savedBase : 'http://127.0.0.1:8000';
     }
     
     /**
      * Authenticate user with license key
      */
-    async authenticate(licenseKey) {
+    // authenticate via license removed
+
+    /**
+     * Login with username/password -> backend issues JWT
+     */
+    async loginWithPassword(username, password) {
         try {
-            const response = await fetch(`${this.apiBase}/auth/validate`, {
+            const response = await fetch(`${this.apiBase}/auth/login`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${licenseKey}`
-                }
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
             });
-            
-            if (response.ok) {
-                const data = await response.json();
-                this.licenseKey = licenseKey;
-                this.isAuthenticated = true;
-                this.userPermissions = data.permissions;
-                this.userInfo = data.user;
-                
-                localStorage.setItem('secrimpo_license', licenseKey);
-                
-                console.log('✅ Authentication successful:', data.user);
-                return { success: true, data };
-            } else {
-                const errorData = await response.json();
-                throw new Error(errorData.detail || 'Invalid license key');
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.detail || 'Invalid credentials');
             }
+            const data = await response.json();
+            this.jwtToken = data.access_token;
+            this.isAuthenticated = true;
+            this.userPermissions = data.permissions || {};
+            this.userInfo = data.user || {};
+            localStorage.setItem('secrimpo_token', this.jwtToken);
+            localStorage.removeItem('secrimpo_license');
+            return { success: true, data };
         } catch (error) {
-            console.error('❌ Authentication failed:', error);
             return { success: false, error: error.message };
         }
     }
@@ -48,10 +48,9 @@ class AuthManager {
      * Get authorization headers for API requests
      */
     getAuthHeaders() {
-        return {
-            'Authorization': `Bearer ${this.licenseKey}`,
-            'Content-Type': 'application/json'
-        };
+        const headers = { 'Content-Type': 'application/json' };
+        if (this.jwtToken) headers['Authorization'] = `Bearer ${this.jwtToken}`;
+        return headers;
     }
     
     /**
@@ -90,7 +89,7 @@ class AuthManager {
         this.isAuthenticated = false;
         this.userPermissions = {};
         this.userInfo = {};
-        localStorage.removeItem('secrimpo_license');
+        localStorage.removeItem('secrimpo_token');
         console.log('👋 User logged out');
     }
     
@@ -98,7 +97,7 @@ class AuthManager {
      * Check current authentication status
      */
     async checkAuthStatus() {
-        if (!this.licenseKey) {
+        if (!this.jwtToken) {
             return false;
         }
         
@@ -129,7 +128,7 @@ class AuthManager {
      * Auto-refresh token if needed
      */
     async refreshAuth() {
-        if (this.licenseKey) {
+        if (this.jwtToken) {
             return await this.checkAuthStatus();
         }
         return false;
@@ -156,6 +155,18 @@ class AuthManager {
 
 // Global instance
 window.authManager = new AuthManager();
+
+// Expose helper to update apiBase at runtime
+window.setSecrimpoApiBase = function(newBase) {
+    if (typeof newBase === 'string' && newBase.trim()) {
+        localStorage.setItem('secrimpo_api_base', newBase.trim());
+        if (window.authManager) {
+            window.authManager.apiBase = newBase.trim();
+        }
+        return true;
+    }
+    return false;
+};
 
 // Auto-setup axios interceptors when available
 if (typeof axios !== 'undefined') {

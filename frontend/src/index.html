@@ -28,10 +28,13 @@
     <div class="user-info">
         <div class="user-avatar">
             <span class="avatar-icon"><i class="fas fa-user"></i></span>
-            <span class="user-name">Anderson dos Santos Matos Mota</span>
+            <span class="user-name" id="userName">Carregando...</span>
         </div>
         <div class="user-status">
-            <span>Usuário Logado - Bem Vindo</span>
+            <span id="userStatus">Verificando sessão...</span>
+        </div>
+        <div>
+            <button id="logoutBtn" class="btn-secondary" style="margin-left: 12px;">Sair</button>
         </div>
     </div>
 
@@ -216,6 +219,40 @@
     <!-- Success/Error Messages -->
     <div id="messageContainer" class="message-container"></div>
 
+    <script src="auth.js"></script>
+    <script>
+    (function(){
+        async function initAuth() {
+            try {
+                const ok = await window.authManager.checkAuthStatus();
+                if (!ok) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+                const info = window.authManager.getUserInfo();
+                const nameEl = document.getElementById('userName');
+                const statusEl = document.getElementById('userStatus');
+                if (nameEl) nameEl.textContent = info.username || 'Usuário';
+                if (statusEl) statusEl.textContent = `Logado como ${info.subscription}`;
+                const logoutBtn = document.getElementById('logoutBtn');
+                if (logoutBtn) {
+                    logoutBtn.addEventListener('click', () => {
+                        window.authManager.logout();
+                        window.location.href = 'login.html';
+                    });
+                }
+            } catch (e) {
+                console.error('Falha na verificação de autenticação', e);
+                window.location.href = 'login.html';
+            }
+        }
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initAuth);
+        } else {
+            initAuth();
+        }
+    })();
+    </script>
     <script src="app.js"></script>
 </body>
 

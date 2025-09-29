@@ -6,9 +6,13 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from .keyauth_config import auth_manager
 import functools
 from typing import Optional
+from jose import jwt, JWTError
+import os
 
 # HTTP Bearer token security
 security = HTTPBearer()
+JWT_SECRET = os.getenv("APP_JWT_SECRET", "dev-secret-please-change")
+JWT_ALG = "HS256"
 
 class AuthContext:
     """Context object containing user authentication data and permissions"""
@@ -42,26 +46,29 @@ def verify_license(credentials: HTTPAuthorizationCredentials = Depends(security)
     """
     Dependency to verify KeyAuth license and return user context
     """
-    license_key = credentials.credentials
-    
-    # Validate license with KeyAuth
-    user_context = auth_manager.validate_and_get_permissions(license_key)
-    
-    if not user_context:
+    token = credentials.credentials
+
+    # Only accept JWT issued by our app
+    try:
+        claims = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALG])
+        username = claims.get("sub") or claims.get("username") or "unknown"
+        subscription = claims.get("subscription", "restricted")
+        permissions = claims.get("permissions") or auth_manager.get_user_permissions(subscription)
+        user_data = {
+            "username": username,
+            "subscription": subscription,
+            "expires": claims.get("exp"),
+            "created_at": None,
+            "last_login": None,
+        }
+        auth_manager.log_user_action(username, "AUTHENTICATED", f"JWT subscription: {subscription}")
+        return AuthContext(user_data, permissions)
+    except JWTError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid or expired license key",
+            detail="Invalid or expired session token",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    
-    # Log successful authentication
-    auth_manager.log_user_action(
-        user_context["username"], 
-        "AUTHENTICATED", 
-        f"Subscription: {user_context['subscription']}"
-    )
-    
-    return AuthContext(user_context["user_data"], user_context["permissions"])
 
 def optional_verify_license(credentials: Optional[HTTPAuthorizationCredentials] = Depends(security)) -> Optional[AuthContext]:
     """

@@ -201,16 +201,14 @@
         
         <form id="loginForm">
             <div class="form-group">
-                <label for="licenseKey">Chave de Licença KeyAuth:</label>
-                <input 
-                    type="text" 
-                    id="licenseKey" 
-                    name="licenseKey" 
-                    placeholder="Digite sua chave de licença"
-                    required
-                    autocomplete="off"
-                >
+                <label for="username">Usuário</label>
+                <input type="text" id="username" name="username" placeholder="Digite seu usuário" autocomplete="username">
             </div>
+            <div class="form-group">
+                <label for="password">Senha</label>
+                <input type="password" id="password" name="password" placeholder="Digite sua senha" autocomplete="current-password">
+            </div>
+            <!-- Licença removida: login apenas com usuário e senha -->
             
             <button type="submit" class="btn-login" id="loginBtn">
                 Entrar no Sistema
@@ -218,24 +216,9 @@
             
             <div id="message"></div>
             <div id="loading" class="loading">
-                Validando licença
+                Validando credenciais
             </div>
         </form>
-        
-        <div class="info-section">
-            <h3>📊 Níveis de Acesso</h3>
-            <div class="subscription-levels">
-                <div class="subscription-item">
-                    <strong>👑 Admin:</strong> Acesso completo ao sistema
-                </div>
-                <div class="subscription-item">
-                    <strong>🎖️ Agent:</strong> Criar e editar ocorrências
-                </div>
-                <div class="subscription-item">
-                    <strong>👁️ Viewer:</strong> Apenas visualização
-                </div>
-            </div>
-        </div>
     </div>
     
     <script src="auth.js"></script>
@@ -243,15 +226,13 @@
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const licenseKey = document.getElementById('licenseKey').value.trim();
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
             const loginBtn = document.getElementById('loginBtn');
             const loading = document.getElementById('loading');
             const message = document.getElementById('message');
             
-            if (!licenseKey) {
-                showMessage('Por favor, digite a chave de licença', 'error');
-                return;
-            }
+            // license key removed: validate only username/password
             
             // Show loading state
             loginBtn.disabled = true;
@@ -260,7 +241,11 @@
             loginBtn.textContent = 'Validando...';
             
             try {
-                const result = await authManager.authenticate(licenseKey);
+                if (!username || !password) {
+                    showMessage('Informe usuário e senha', 'error');
+                    return;
+                }
+                const result = await authManager.loginWithPassword(username, password);
                 
                 if (result.success) {
                     showMessage(`✅ Login realizado com sucesso! Bem-vindo, ${result.data.user.username}`, 'success');
@@ -308,7 +293,7 @@
         });
         
         // Handle Enter key
-        document.getElementById('licenseKey').addEventListener('keypress', (e) => {
+        document.getElementById('password').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 document.getElementById('loginForm').dispatchEvent(new Event('submit'));
             }

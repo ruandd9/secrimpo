@@ -8,11 +8,11 @@ from datetime import datetime
 
 class KeyAuthManager:
     def __init__(self):
-        # KeyAuth configuration - Replace with your actual credentials
-        self.app_name = os.getenv("KEYAUTH_APP_NAME", "Aplicativo de Gabriel47")
-        self.owner_id = os.getenv("KEYAUTH_OWNER_ID", "eqVjoVksfB")
-        self.secret = os.getenv("KEYAUTH_SECRET", "YOUR_SECRET")
-        self.version = "1.0"
+        # KeyAuth configuration - Usando suas credenciais
+        self.app_name = "Secrimpo"  # Nome da aplicação
+        self.owner_id = "eqVjoVksfB"  # ID da conta
+        self.secret = os.getenv("KEYAUTH_SECRET", "61448643819ae5b00418dcfe9d171662a62db6d16cad37f8bc7ce57420efa1c4")
+        self.version = "1.0"  # Versão da aplicação
         self.keyauth = None
         self.initialized = False
         
@@ -40,16 +40,31 @@ class KeyAuthManager:
         """Validates a license key and returns user data"""
         if not self.initialized:
             # Demo mode - accept any license key for testing
+            # Simular diferentes tipos de usuário baseado na chave
+            if license_key.lower() in ["admin", "administrator", "admin-key"]:
+                subscription = "admin"
+                username = "admin_user"
+            elif license_key.lower() in ["agent", "agente", "agent-key"]:
+                subscription = "agent"
+                username = "agent_user"
+            elif license_key.lower() in ["viewer", "visualizador", "viewer-key"]:
+                subscription = "viewer"
+                username = "viewer_user"
+            else:
+                # Qualquer outra chave é admin por padrão
+                subscription = "admin"
+                username = "demo_user"
+            
             return {
                 "valid": True,
                 "user_data": {
-                    "username": "demo_user",
-                    "subscription": "admin",
+                    "username": username,
+                    "subscription": subscription,
                     "expires": "Never",
                     "created_at": "2024-01-01",
                     "last_login": "2024-01-01"
                 },
-                "subscription": "admin"
+                "subscription": subscription
             }
             
         try:
@@ -75,6 +90,62 @@ class KeyAuthManager:
                 "valid": False,
                 "error": str(e)
             }
+
+    def login_user(self, username: str, password: str) -> Dict[str, Any]:
+        """Authenticate user with KeyAuth credentials (username/password)."""
+        if not self.initialized:
+            # Demo fallback users
+            demo_users = {
+                "admin": {"password": "admin", "subscription": "admin"},
+                "agent": {"password": "agent", "subscription": "agent"},
+                "viewer": {"password": "viewer", "subscription": "viewer"},
+            }
+            user = demo_users.get(username)
+            if user and user["password"] == password:
+                user_data = {
+                    "username": username,
+                    "subscription": user["subscription"],
+                    "expires": "Never",
+                    "created_at": "2024-01-01",
+                    "last_login": datetime.now().strftime("%Y-%m-%d")
+                }
+                return {"valid": True, "user_data": user_data}
+            return {"valid": False, "error": "Invalid credentials"}
+
+        try:
+            # Use KeyAuth user login
+            # The python keyauth API exposes: self.keyauth.login(user, passwd)
+            self.keyauth.login(username, password)
+            # Some keyauth python builds may not expose user_data; build safe defaults
+            ud = getattr(self.keyauth, "user_data", None)
+            if ud is not None:
+                subscription = getattr(ud, "subscription", None)
+                # subscriptions list can be dicts; handle safely
+                subs_list = getattr(ud, "subscriptions", []) or []
+                expiry = None
+                if isinstance(subs_list, (list, tuple)) and subs_list:
+                    first = subs_list[0]
+                    if isinstance(first, dict):
+                        expiry = first.get("expiry")
+                user_data = {
+                    "username": getattr(ud, "username", username),
+                    "subscription": subscription or "agent",
+                    "expires": expiry,
+                    "created_at": getattr(ud, "createdate", None),
+                    "last_login": getattr(ud, "lastlogin", None)
+                }
+            else:
+                # Fallback if SDK doesn't return user_data
+                user_data = {
+                    "username": username,
+                    "subscription": os.getenv("DEFAULT_SUBSCRIPTION", "agent"),
+                    "expires": None,
+                    "created_at": None,
+                    "last_login": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                }
+            return {"valid": True, "user_data": user_data}
+        except Exception as e:
+            return {"valid": False, "error": str(e)}
     
     def get_user_permissions(self, subscription: str) -> Dict[str, bool]:
         """Define permissions based on subscription type"""
