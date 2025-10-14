@@ -4,225 +4,124 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SECRIMPO - Login</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-        
-        .login-container {
-            background: white;
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1), 0 5px 15px rgba(0,0,0,0.07);
-            max-width: 450px;
-            width: 100%;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .login-container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #1e3c72, #2a5298, #1e3c72);
-        }
-        
-        .logo {
-            text-align: center;
-            margin-bottom: 35px;
-        }
-        
-        .logo h1 {
-            color: #1e3c72;
-            margin: 0;
-            font-size: 2.2em;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-        }
-        
-        .logo p {
-            color: #666;
-            margin-top: 5px;
-            font-size: 0.95em;
-        }
-        
-        .form-group {
-            margin-bottom: 25px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: #333;
-            font-weight: 600;
-            font-size: 0.9em;
-        }
-        
-        input[type="text"] {
-            width: 100%;
-            padding: 14px 16px;
-            border: 2px solid #e1e5e9;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: all 0.3s ease;
-            background: #fafbfc;
-        }
-        
-        input[type="text"]:focus {
-            outline: none;
-            border-color: #2a5298;
-            background: white;
-            box-shadow: 0 0 0 3px rgba(42, 82, 152, 0.1);
-        }
-        
-        .btn-login {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #1e3c72, #2a5298);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .btn-login:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 5px 15px rgba(30, 60, 114, 0.3);
-        }
-        
-        .btn-login:active {
-            transform: translateY(0);
-        }
-        
-        .btn-login:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-        
-        .message {
-            margin-top: 15px;
-            padding: 12px;
-            border-radius: 6px;
-            text-align: center;
-            font-weight: 500;
-        }
-        
-        .error-message {
-            background: #fee;
-            color: #c53030;
-            border: 1px solid #fecaca;
-        }
-        
-        .success-message {
-            background: #f0fff4;
-            color: #22543d;
-            border: 1px solid #c6f6d5;
-        }
-        
-        .loading {
-            display: none;
-            text-align: center;
-            margin-top: 15px;
-            color: #666;
-        }
-        
-        .loading::after {
-            content: '...';
-            animation: dots 1.5s infinite;
-        }
-        
-        @keyframes dots {
-            0%, 20% { color: transparent; text-shadow: .25em 0 0 transparent, .5em 0 0 transparent; }
-            40% { color: #666; text-shadow: .25em 0 0 transparent, .5em 0 0 transparent; }
-            60% { text-shadow: .25em 0 0 #666, .5em 0 0 transparent; }
-            80%, 100% { text-shadow: .25em 0 0 #666, .5em 0 0 #666; }
-        }
-        
-        .info-section {
-            margin-top: 30px;
-            padding-top: 25px;
-            border-top: 1px solid #e1e5e9;
-            text-align: center;
-        }
-        
-        .info-section h3 {
-            color: #1e3c72;
-            margin-bottom: 15px;
-            font-size: 1.1em;
-        }
-        
-        .subscription-levels {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 10px;
-            font-size: 0.85em;
-        }
-        
-        .subscription-item {
-            padding: 8px 12px;
-            background: #f8f9fa;
-            border-radius: 5px;
-            border-left: 3px solid #2a5298;
-        }
-        
-        .subscription-item strong {
-            color: #1e3c72;
-        }
-    </style>
+    <link rel="stylesheet" href="login.css">
 </head>
 <body>
-    <div class="login-container">
-        <div class="logo">
-            <h1>🔒 SECRIMPO</h1>
-            <p>Sistema de Registro de Ocorrências Policiais</p>
+    <div class="header">
+        <img src="../assets/img/logo-pmdf.svg" alt="Polícia Militar DF" class="logo-left">
+        <img src="../assets/img/logo-gdf.svg" alt="Governo do Distrito Federal" class="logo-right">
+    </div>
+    
+    <div class="main-container">
+        <div class="login-container">
+            <div class="access-title">
+                <img src="../assets/img/logo-shield.svg" alt="Escudo" class="shield-icon">
+                <h1>Acesso Restrito</h1>
+            </div>
+            <p class="access-subtitle">Autentique-se para acessar o sistema</p>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Usuário</label>
+                    <div class="input-container">
+                        <img src="../assets/img/usuario.svg" alt="Usuário" class="input-icon">
+                        <select id="username" name="username" required>
+                            <option value="">👤</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Senha</label>
+                    <div class="input-container">
+                        <img src="../assets/img/senha.svg" alt="Senha" class="input-icon">
+                        <input type="password" id="password" name="password" placeholder="" autocomplete="current-password" required>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn-login" id="loginBtn">
+                    Entrar no Sistema
+                </button>
+                
+                <div id="message"></div>
+                <div id="loading" class="loading">
+                    Validando credenciais
+                </div>
+            </form>
         </div>
-        
-        <form id="loginForm">
-            <div class="form-group">
-                <label for="username">Usuário</label>
-                <input type="text" id="username" name="username" placeholder="Digite seu usuário" autocomplete="username">
-            </div>
-            <div class="form-group">
-                <label for="password">Senha</label>
-                <input type="password" id="password" name="password" placeholder="Digite sua senha" autocomplete="current-password">
-            </div>
-            <!-- Licença removida: login apenas com usuário e senha -->
-            
-            <button type="submit" class="btn-login" id="loginBtn">
-                Entrar no Sistema
-            </button>
-            
-            <div id="message"></div>
-            <div id="loading" class="loading">
-                Validando credenciais
-            </div>
-        </form>
+    </div>
+    
+    <div class="footer">
+        <p><a href="#" class="footer-brand">SECRIMPO</a> © 2025 - Todos os direitos reservados.<br>
+        Desenvolvido Por <strong>CONSULTOS LTDA</strong></p>
     </div>
     
     <script src="auth.js"></script>
     <script>
+        // Populate user dropdown on page load
+        window.addEventListener('load', async () => {
+            console.log('🔍 Loading users and checking authentication...');
+            
+            // Load users for dropdown
+            await loadUsers();
+            
+            // Check if already authenticated
+            if (await authManager.checkAuthStatus()) {
+                console.log('✅ User already authenticated, redirecting...');
+                showMessage('✅ Já autenticado! Redirecionando...', 'success');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1000);
+            } else {
+                console.log('❌ No valid authentication found');
+            }
+        });
+        
+        async function loadUsers() {
+            try {
+                const response = await fetch('/api/users');
+                if (response.ok) {
+                    const users = await response.json();
+                    const userSelect = document.getElementById('username');
+                    
+                    // Clear existing options except the first one
+                    userSelect.innerHTML = '<option value="">Selecione o usuário</option>';
+                    
+                    // Add users to dropdown
+                    users.forEach(user => {
+                        const option = document.createElement('option');
+                        option.value = user.username;
+                        option.textContent = user.username;
+                        userSelect.appendChild(option);
+                    });
+                } else {
+                    console.log('Could not load users, using text input fallback');
+                    // Convert select to text input if API fails
+                    const userSelect = document.getElementById('username');
+                    const textInput = document.createElement('input');
+                    textInput.type = 'text';
+                    textInput.id = 'username';
+                    textInput.name = 'username';
+                    textInput.placeholder = 'Digite seu usuário';
+                    textInput.autocomplete = 'username';
+                    textInput.required = true;
+                    userSelect.parentNode.replaceChild(textInput, userSelect);
+                }
+            } catch (error) {
+                console.log('Error loading users:', error);
+                // Convert select to text input on error
+                const userSelect = document.getElementById('username');
+                const textInput = document.createElement('input');
+                textInput.type = 'text';
+                textInput.id = 'username';
+                textInput.name = 'username';
+                textInput.placeholder = 'Digite seu usuário';
+                textInput.autocomplete = 'username';
+                textInput.required = true;
+                userSelect.parentNode.replaceChild(textInput, userSelect);
+            }
+        }
+        
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -231,8 +130,6 @@
             const loginBtn = document.getElementById('loginBtn');
             const loading = document.getElementById('loading');
             const message = document.getElementById('message');
-            
-            // license key removed: validate only username/password
             
             // Show loading state
             loginBtn.disabled = true;
@@ -276,21 +173,6 @@
             message.innerHTML = text;
             message.className = `message ${type === 'error' ? 'error-message' : 'success-message'}`;
         }
-        
-        // Check if already authenticated
-        window.addEventListener('load', async () => {
-            console.log('🔍 Checking existing authentication...');
-            
-            if (await authManager.checkAuthStatus()) {
-                console.log('✅ User already authenticated, redirecting...');
-                showMessage('✅ Já autenticado! Redirecionando...', 'success');
-                setTimeout(() => {
-                    window.location.href = 'index.html';
-                }, 1000);
-            } else {
-                console.log('❌ No valid authentication found');
-            }
-        });
         
         // Handle Enter key
         document.getElementById('password').addEventListener('keypress', (e) => {
